@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterLink, RouterView } from "vue-router";
+</script>
+
+<script lang="ts">
+import pocketbase from "@/lib/pocketbase";
+
+const verse = await pocketbase
+  .collection("bible")
+  .getFirstListItem(`book.name = "Genesis" && chapter = 50 && verse = 26`)
+  .catch(() => null);
+
+console.log(verse);
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/faq">FAQ</RouterLink>
       </nav>
     </div>
   </header>

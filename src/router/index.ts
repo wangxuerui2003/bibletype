@@ -1,23 +1,43 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import HomeView from "../views/HomeView.vue";
+import AuthView from "../views/AuthView.vue";
+import pocketbase from "@/lib/pocketbase";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'home',
+      path: "/",
+      name: "home",
       component: HomeView,
+      meta: { requiresAuth: true },
     },
     {
-      path: '/about',
-      name: 'about',
+      path: "/faq",
+      name: "FAQs",
       // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
+      component: () => import("../views/FAQView.vue"),
+    },
+    {
+      path: "/auth",
+      name: "auth",
+      component: AuthView,
     },
   ],
-})
+});
 
-export default router
+// Navigation guard
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = pocketbase.authStore.isValid;
+
+  if (to.matched.some((record) => record.meta.requiresAuth) && !isAuthenticated) {
+    // Redirect to auth page if route requires auth and user is not authenticated
+    next({ name: "auth" });
+  } else {
+    // Otherwise proceed
+    next();
+  }
+});
+
+export default router;
