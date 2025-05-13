@@ -41,7 +41,7 @@ const faqs = ref([
   {
     question: "What is BibleType?",
     answer:
-      "BibleType is a typing practice application that helps you improve your typing speed and accuracy while engaging with scripture. You type verses from the Bible and get real-time feedback on your performance.",
+      "BibleType is a typing practice application that helps you improve your typing speed and accuracy while engaging with the Holy Bible. You type verses from the Bible and get real-time feedback on your performance.",
   },
   {
     question: "How is typing speed calculated?",
@@ -51,7 +51,7 @@ const faqs = ref([
   {
     question: "Can I choose specific Bible books or chapters?",
     answer:
-      "Currently, BibleType progresses sequentially through scripture, but we're working on adding book/chapter selection in a future update.",
+      "Currently, BibleType progresses sequentially through Hody Bible, but we're working on adding book/chapter selection in a future update.",
   },
   {
     question: "Why does it mark words as incorrect when I'm still typing them?",
@@ -61,12 +61,12 @@ const faqs = ref([
   {
     question: "How do I move to the next verse?",
     answer:
-      "After completing a verse, a 'Next Verse' button will appear. Click it to proceed to the next scripture passage.",
+      "After completing a verse, a 'Next Verse' button will appear. Click it to proceed to the next Hody Bible passage.",
   },
   {
     question: "Is my progress saved if I leave the page?",
     answer:
-      "Yes! Your progress through the Bible is automatically saved. When you return, you'll pick up where you left off.",
+      "Yes! Your progress through the Bible is automatically saved to the backend. When you return, you'll pick up where you left off.",
   },
   {
     question: "Can I practice the same verse multiple times?",
@@ -76,7 +76,11 @@ const faqs = ref([
   {
     question: "What Bible translation is being used?",
     answer:
-      "BibleType currently uses the English Standard Version (ESV), known for its balance of accuracy and readability. We may add more translation options in the future.",
+      "BibleType currently uses the New International Version (NIV), known for its balance of accuracy and readability. We may add more translation options in the future.",
+  },
+  {
+    question: "Who is the person in the default avatar?",
+    answer: "President Donald Chang, the idea provider of this project. You're welcome.",
   },
 ]);
 </script>
