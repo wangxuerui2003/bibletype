@@ -12,6 +12,15 @@ interface UserProgress {
   updated: string;
 }
 
+interface BibleVerseRecord {
+  id: string;
+  book: string;
+  chapter: number;
+  verse: number;
+  text: string;
+  updated: string;
+}
+
 export const useProgressStore = defineStore("progress", {
   state: () => ({
     currentProgress: {} as UserProgress,
@@ -24,14 +33,12 @@ export const useProgressStore = defineStore("progress", {
     async init() {
       // Initial fetch the user current progress
       try {
-        console.log("get user progress");
-        // Create initial user progress
         const progress = (await pocketbase
           .collection("user_progress")
           .getFirstListItem(`user = "${pocketbase.authStore.record?.id}"`)) as UserProgress;
 
         this.currentProgress = progress;
-        console.log(this.currentProgress);
+        await this.updateCurrentVerse();
       } catch (err) {
         console.error("Failed to fetch user progress:", err);
       }
@@ -84,15 +91,21 @@ export const useProgressStore = defineStore("progress", {
         progressData.verse++;
       }
 
-      console.log(progressData);
       const updatedProgress = (await pocketbase
         .collection("user_progress")
         .update(this.currentProgress.id, progressData)) as UserProgress;
       this.currentProgress = updatedProgress;
     },
-    updateCurrentVerse() {
-      // TODO
-      // manually update verse to trigger reactivity in bibletype component
+    async updateCurrentVerse() {
+      const book = await pocketbase
+        .collection("bible_books")
+        .getFirstListItem(`name = "${this.currentProgress.book}"`);
+      const verse: BibleVerseRecord = await pocketbase
+        .collection("bible")
+        .getFirstListItem(
+          `book = "${book.id}" && chapter = "${this.currentProgress.chapter}" && verse = "${this.currentProgress.verse}"`
+        );
+      this.currentVerse = verse.text;
     },
   },
 });

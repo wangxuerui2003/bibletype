@@ -50,7 +50,6 @@ export const useAuthStore = defineStore("auth", {
 
     async initializeNewUser() {
       try {
-        console.log("Initialize user progress");
         // Create initial user progress
         await pocketbase.collection("user_progress").create({
           user: this.user?.id,

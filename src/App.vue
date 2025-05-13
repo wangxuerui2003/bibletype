@@ -2,16 +2,7 @@
 import { RouterLink, RouterView } from "vue-router";
 </script>
 
-<script lang="ts">
-import pocketbase from "@/lib/pocketbase";
-
-const verse = await pocketbase
-  .collection("bible")
-  .getFirstListItem(`book.name = "Genesis" && chapter = 50 && verse = 26`)
-  .catch(() => null);
-
-console.log(verse);
-</script>
+<script lang="ts"></script>
 
 <template>
   <header>
