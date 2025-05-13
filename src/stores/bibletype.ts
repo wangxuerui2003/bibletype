@@ -45,7 +45,13 @@ export const useBTStore = defineStore("bibletype", {
 
   actions: {
     async init(verseText: string) {
-      this.currentVerse = verseText.trim().replace("’", "'");
+      const map = {
+        "“": '"',
+        "”": '"',
+        "’": "'",
+        "‘": "'",
+      };
+      this.currentVerse = verseText.trim().replace(/[“”’‘]/gu, (match) => map[match] || match);
       this.words = this.currentVerse.split(/\s+/).map((word) => ({
         text: word,
         completed: false,
