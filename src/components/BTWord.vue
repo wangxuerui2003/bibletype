@@ -1,7 +1,6 @@
 <template>
   <div class="bt-word" :class="{ active }">
     <!-- Initial cursor for empty word -->
-    <span v-if="active && typed.length === 0" class="blinking-cursor initial-cursor"></span>
 
     <span
       v-for="(char, index) in word.split('')"
@@ -14,6 +13,10 @@
         untyped: !typed,
       }"
     >
+      <span
+        v-if="active && typed.length === 0 && index === 0"
+        class="blinking-cursor initial-cursor"
+      ></span>
       {{ char }}
       <span v-if="active && index === typed.length - 1" class="blinking-cursor"></span>
     </span>
@@ -79,8 +82,9 @@ defineProps<{
 }
 
 .initial-cursor {
-  left: 0;
+  left: -2px;
   right: auto;
+  display: inline-block;
 }
 
 .char-container {
@@ -91,7 +95,7 @@ defineProps<{
 .blinking-cursor {
   position: absolute;
   right: -2px;
-  top: 50%;
+  top: 45%;
   transform: translateY(-45%);
   width: 2px;
   height: 1.2em;
