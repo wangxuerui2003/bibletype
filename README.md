@@ -17,8 +17,9 @@ $ pnpm build
 
 - [x] Auth Page
 - [x] Home Page, the main bible typing page (require auth)
-- [ ] FAQs Page
-- [ ] Bug/Suggestions Feedback Page (require auth)
-- [ ] Auth Page styling
-- [ ] Home Page styling
-- [ ] Navbar with good styling
+- [x] FAQs Page
+- [x] Bug/Suggestions Feedback Page (require auth)
+- [x] Auth Page styling
+- [x] Home Page styling
+- [x] Navbar with good styling
+- [ ] Settings page
