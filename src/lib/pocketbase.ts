@@ -11,5 +11,6 @@ export type User = {
 };
 
 const pocketbase = new PocketBase(POCKETBASE_URL);
+pocketbase.autoCancellation(false);
 
 export default pocketbase;

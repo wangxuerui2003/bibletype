@@ -1,4 +1,3 @@
-<!-- views/FeedbackView.vue -->
 <template>
   <div class="min-h-screen bg-base-100 p-6">
     <div class="max-w-7xl mx-auto">
@@ -28,20 +27,53 @@
                 Add
               </button>
             </div>
-            <div class="space-y-4">
+
+            <div v-if="isLoading[CATEGORY.FEEDBACK]" class="flex justify-center py-4">
+              <span class="loading loading-spinner loading-lg"></span>
+            </div>
+
+            <div v-else class="space-y-4">
               <div
                 v-for="(item, index) in feedbackItems"
-                :key="'feedback-' + index"
+                :key="item.id"
                 class="card bg-base-100 shadow-sm p-4"
               >
                 <p>{{ item.content }}</p>
-                <div class="text-xs opacity-50 mt-2">{{ formatDate(item.created) }}</div>
+                <div class="flex justify-between items-center mt-2">
+                  <div class="text-xs opacity-50">
+                    {{ getUsername(item) }} • {{ formatDate(item.created) }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-between mt-4">
+                <button
+                  @click="changePage(CATEGORY.FEEDBACK, 'prev')"
+                  class="btn btn-sm"
+                  :disabled="currentPage[CATEGORY.FEEDBACK] <= 1"
+                >
+                  Previous
+                </button>
+                <span class="text-sm self-center">
+                  Page {{ currentPage[CATEGORY.FEEDBACK] }} of
+                  {{ Math.ceil(totalItems[CATEGORY.FEEDBACK] / perPage) }}
+                </span>
+                <button
+                  @click="changePage(CATEGORY.FEEDBACK, 'next')"
+                  class="btn btn-sm"
+                  :disabled="
+                    currentPage[CATEGORY.FEEDBACK] >=
+                    Math.ceil(totalItems[CATEGORY.FEEDBACK] / perPage)
+                  "
+                >
+                  Next
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Bugs Column -->
+        <!-- Bug Column -->
         <div class="card bg-base-200 shadow">
           <div class="card-body">
             <div class="flex justify-between items-center mb-4">
@@ -64,20 +96,52 @@
                 Report
               </button>
             </div>
-            <div class="space-y-4">
+
+            <div v-if="isLoading[CATEGORY.BUG]" class="flex justify-center py-4">
+              <span class="loading loading-spinner loading-lg"></span>
+            </div>
+
+            <div v-else class="space-y-4">
               <div
                 v-for="(item, index) in bugItems"
-                :key="'bug-' + index"
+                :key="item.id"
                 class="card bg-base-100 shadow-sm p-4"
               >
                 <p>{{ item.content }}</p>
-                <div class="text-xs opacity-50 mt-2">{{ formatDate(item.created) }}</div>
+                <div class="flex justify-between items-center mt-2">
+                  <div class="text-xs opacity-50">
+                    {{ getUsername(item) }} • {{ formatDate(item.created) }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-between mt-4">
+                <button
+                  @click="changePage(CATEGORY.BUG, 'prev')"
+                  class="btn btn-sm"
+                  :disabled="currentPage[CATEGORY.BUG] <= 1"
+                >
+                  Previous
+                </button>
+                <span class="text-sm self-center">
+                  Page {{ currentPage[CATEGORY.BUG] }} of
+                  {{ Math.ceil(totalItems[CATEGORY.BUG] / perPage) }}
+                </span>
+                <button
+                  @click="changePage(CATEGORY.BUG, 'next')"
+                  class="btn btn-sm"
+                  :disabled="
+                    currentPage[CATEGORY.BUG] >= Math.ceil(totalItems[CATEGORY.BUG] / perPage)
+                  "
+                >
+                  Next
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Suggestions Column -->
+        <!-- Suggestion Column -->
         <div class="card bg-base-200 shadow">
           <div class="card-body">
             <div class="flex justify-between items-center mb-4">
@@ -100,14 +164,47 @@
                 Suggest
               </button>
             </div>
-            <div class="space-y-4">
+
+            <div v-if="isLoading[CATEGORY.SUGGESTION]" class="flex justify-center py-4">
+              <span class="loading loading-spinner loading-lg"></span>
+            </div>
+
+            <div v-else class="space-y-4">
               <div
                 v-for="(item, index) in suggestionItems"
-                :key="'suggestion-' + index"
+                :key="item.id"
                 class="card bg-base-100 shadow-sm p-4"
               >
                 <p>{{ item.content }}</p>
-                <div class="text-xs opacity-50 mt-2">{{ formatDate(item.created) }}</div>
+                <div class="flex justify-between items-center mt-2">
+                  <div class="text-xs opacity-50">
+                    {{ getUsername(item) }} • {{ formatDate(item.created) }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-between mt-4">
+                <button
+                  @click="changePage(CATEGORY.SUGGESTION, 'prev')"
+                  class="btn btn-sm"
+                  :disabled="currentPage[CATEGORY.SUGGESTION] <= 1"
+                >
+                  Previous
+                </button>
+                <span class="text-sm self-center">
+                  Page {{ currentPage[CATEGORY.SUGGESTION] }} of
+                  {{ Math.ceil(totalItems[CATEGORY.SUGGESTION] / perPage) }}
+                </span>
+                <button
+                  @click="changePage(CATEGORY.SUGGESTION, 'next')"
+                  class="btn btn-sm"
+                  :disabled="
+                    currentPage[CATEGORY.SUGGESTION] >=
+                    Math.ceil(totalItems[CATEGORY.SUGGESTION] / perPage)
+                  "
+                >
+                  Next
+                </button>
               </div>
             </div>
           </div>
@@ -115,7 +212,7 @@
       </div>
     </div>
 
-    <!-- Modal for adding new items -->
+    <!-- Modal -->
     <div class="modal" :class="{ 'modal-open': showModal }">
       <div class="modal-box">
         <h3 class="font-bold text-lg mb-4">Add New {{ modalTitle }}</h3>
@@ -134,32 +231,179 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import pocketbase from "@/lib/pocketbase";
 
 const router = useRouter();
 
-// Sample data - replace with PocketBase integration later
-const feedbackItems = ref([
-  { content: "Love the typing experience!", created: new Date() },
-  { content: "The verse selection is great", created: new Date(Date.now() - 86400000) },
-]);
+// Constants for category types
+const CATEGORY = {
+  FEEDBACK: 0,
+  BUG: 1,
+  SUGGESTION: 2,
+} as const;
 
-const bugItems = ref([
-  { content: "Timer sometimes doesn't start", created: new Date(Date.now() - 172800000) },
-]);
+interface FeedbackModel {
+  id: string;
+  user: string;
+  category: number;
+  content: string;
+  created: string;
+  updated: string;
+}
 
-const suggestionItems = ref([
-  { content: "Add more Bible translations", created: new Date(Date.now() - 259200000) },
-  { content: "Dark mode toggle would be nice", created: new Date(Date.now() - 345600000) },
-]);
+// State for pagination
+const currentPage = ref({
+  [CATEGORY.FEEDBACK]: 1,
+  [CATEGORY.BUG]: 1,
+  [CATEGORY.SUGGESTION]: 1,
+});
+const perPage = 5; // Items per page
+const totalItems = ref({
+  [CATEGORY.FEEDBACK]: 0,
+  [CATEGORY.BUG]: 0,
+  [CATEGORY.SUGGESTION]: 0,
+});
+
+// Reactive data
+const feedbackItems = ref<FeedbackModel[]>([]);
+const bugItems = ref<FeedbackModel[]>([]);
+const suggestionItems = ref<FeedbackModel[]>([]);
+const isLoading = ref({
+  [CATEGORY.FEEDBACK]: false,
+  [CATEGORY.BUG]: false,
+  [CATEGORY.SUGGESTION]: false,
+});
 
 // Modal state
 const showModal = ref(false);
 const activeType = ref<"feedback" | "bug" | "suggestion">("feedback");
 const newItemContent = ref("");
 
+// Fetch feedback items from PocketBase
+const fetchItems = async (category: number, page: number) => {
+  try {
+    isLoading.value[category] = true;
+    const result = await pocketbase.collection("feedback").getList(page, perPage, {
+      filter: `category = ${category}`,
+      sort: "-created",
+      expand: "user",
+    });
+
+    return {
+      items: result.items,
+      total: result.totalItems,
+    };
+  } catch (error) {
+    console.error(`Error fetching category ${category}:`, error);
+    return { items: [], total: 0 };
+  } finally {
+    isLoading.value[category] = false;
+  }
+};
+
+// Load all categories
+const loadAllItems = async () => {
+  const [feedback, bugs, suggestions] = await Promise.all([
+    fetchItems(CATEGORY.FEEDBACK, currentPage.value[CATEGORY.FEEDBACK]),
+    fetchItems(CATEGORY.BUG, currentPage.value[CATEGORY.BUG]),
+    fetchItems(CATEGORY.SUGGESTION, currentPage.value[CATEGORY.SUGGESTION]),
+  ]);
+
+  feedbackItems.value = feedback.items;
+  totalItems.value[CATEGORY.FEEDBACK] = feedback.total;
+
+  bugItems.value = bugs.items;
+  totalItems.value[CATEGORY.BUG] = bugs.total;
+
+  suggestionItems.value = suggestions.items;
+  totalItems.value[CATEGORY.SUGGESTION] = suggestions.total;
+};
+
+// Handle pagination
+const changePage = async (category: number, direction: "prev" | "next") => {
+  if (direction === "prev" && currentPage.value[category] > 1) {
+    currentPage.value[category]--;
+  } else if (
+    direction === "next" &&
+    currentPage.value[category] < Math.ceil(totalItems.value[category] / perPage)
+  ) {
+    currentPage.value[category]++;
+  }
+
+  const result = await fetchItems(category, currentPage.value[category]);
+  if (category === CATEGORY.FEEDBACK) {
+    feedbackItems.value = result.items;
+  } else if (category === CATEGORY.BUG) {
+    bugItems.value = result.items;
+  } else {
+    suggestionItems.value = result.items;
+  }
+};
+
+// Submit new feedback
+const submitItem = async () => {
+  if (!newItemContent.value.trim()) return;
+
+  try {
+    const category =
+      activeType.value === "feedback"
+        ? CATEGORY.FEEDBACK
+        : activeType.value === "bug"
+        ? CATEGORY.BUG
+        : CATEGORY.SUGGESTION;
+
+    await pocketbase.collection("feedback").create({
+      content: newItemContent.value,
+      category,
+      user: pocketbase.authStore.model?.id,
+    });
+
+    // Refresh the current category
+    const result = await fetchItems(category, 1);
+    if (category === CATEGORY.FEEDBACK) {
+      feedbackItems.value = result.items;
+      currentPage.value[CATEGORY.FEEDBACK] = 1;
+    } else if (category === CATEGORY.BUG) {
+      bugItems.value = result.items;
+      currentPage.value[CATEGORY.BUG] = 1;
+    } else {
+      suggestionItems.value = result.items;
+      currentPage.value[CATEGORY.SUGGESTION] = 1;
+    }
+
+    closeModal();
+  } catch (error) {
+    console.error("Error submitting feedback:", error);
+    // Handle error (show toast/message)
+  }
+};
+
+// Format date
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+// Get username from expanded user relation
+const getUsername = (item: FeedbackModel) => {
+  return item.expand?.user?.name || "Anonymous";
+};
+
+// Check authentication and load data
+onMounted(async () => {
+  if (!pocketbase.authStore.isValid) {
+    router.push("/auth");
+    return;
+  }
+  await loadAllItems();
+});
+
+// Modal title computed property
 const modalTitle = computed(() => {
   switch (activeType.value) {
     case "feedback":
@@ -173,6 +417,7 @@ const modalTitle = computed(() => {
   }
 });
 
+// Modal functions
 const openModal = (type: "feedback" | "bug" | "suggestion") => {
   activeType.value = type;
   newItemContent.value = "";
@@ -182,43 +427,6 @@ const openModal = (type: "feedback" | "bug" | "suggestion") => {
 const closeModal = () => {
   showModal.value = false;
 };
-
-const submitItem = () => {
-  if (!newItemContent.value.trim()) return;
-
-  const newItem = {
-    content: newItemContent.value,
-    created: new Date(),
-  };
-
-  switch (activeType.value) {
-    case "feedback":
-      feedbackItems.value.unshift(newItem);
-      break;
-    case "bug":
-      bugItems.value.unshift(newItem);
-      break;
-    case "suggestion":
-      suggestionItems.value.unshift(newItem);
-      break;
-  }
-
-  // TODO: Add PocketBase upload logic here
-  closeModal();
-};
-
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
-
-// Check authentication
-if (!pocketbase.authStore.isValid) {
-  router.push("/auth");
-}
 </script>
 
 <style scoped>
