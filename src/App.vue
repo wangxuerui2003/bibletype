@@ -14,19 +14,4 @@ import FooterBar from "./components/FooterBar.vue";
   </div>
 </template>
 
-<style>
-/* Prevent scrolling */
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-#app {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-</style>
+<style></style>
