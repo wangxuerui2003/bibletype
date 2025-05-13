@@ -2,8 +2,28 @@
   <div class="navbar bg-base-100 shadow-lg">
     <!-- Nav links -->
     <div class="flex-1">
-      <RouterLink to="/" class="btn btn-ghost text-xl">Home</RouterLink>
-      <RouterLink to="/faq" class="btn btn-ghost text-xl">FAQ</RouterLink>
+      <RouterLink
+        to="/"
+        class="btn btn-ghost text-xl"
+        :class="{ 'btn-active': route.path === '/' }"
+      >
+        Home
+      </RouterLink>
+      <RouterLink
+        to="/faq"
+        class="btn btn-ghost text-xl"
+        :class="{ 'btn-active': route.path === '/faq' }"
+      >
+        FAQ
+      </RouterLink>
+      <RouterLink
+        v-if="authStore.isAuthenticated"
+        to="/feedback"
+        class="btn btn-ghost text-xl"
+        :class="{ 'btn-active': route.path === '/feedback' }"
+      >
+        Feedback
+      </RouterLink>
     </div>
 
     <!-- User Profile -->
@@ -44,16 +64,22 @@
 </template>
 
 <script setup lang="ts">
-import { RouterLink, useRouter } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import pocketbase from "@/lib/pocketbase";
-import { storeToRefs } from "pinia";
+import { computed } from "vue";
+
 const router = useRouter();
+const route = useRoute();
 
 const authStore = useAuthStore();
-const { user } = storeToRefs(authStore);
-const avatarUrl = pocketbase.files.getURL(pocketbase.authStore.record, user.value.avatar, {
-  thumb: "100x250",
+const avatarUrl = computed(() => {
+  if (authStore.user?.avatar) {
+    return pocketbase.files.getUrl(authStore.user, authStore.user.avatar, {
+      thumb: "100x250",
+    });
+  }
+  return null;
 });
 
 const handleLogout = () => {

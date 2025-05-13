@@ -15,14 +15,24 @@ const router = createRouter({
     {
       path: "/faq",
       name: "FAQs",
-      // route level code-splitting
-      // which is lazy-loaded when the route is visited.
       component: () => import("../views/FAQView.vue"),
     },
     {
       path: "/auth",
       name: "auth",
       component: AuthView,
+    },
+    {
+      path: "/feedback",
+      name: "feedback",
+      component: () => import("../views/FeedbackView.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/settings",
+      name: "settings",
+      component: () => import("../views/SettingsView.vue"),
+      meta: { requiresAuth: true },
     },
   ],
 });
