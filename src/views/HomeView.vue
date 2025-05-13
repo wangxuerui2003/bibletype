@@ -70,23 +70,42 @@
             </div>
           </div>
 
-          <button @click="loadNextVerse" class="btn btn-success btn-sm px-4">
-            Next Verse
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 ml-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 5l7 7-7 7M5 5l7 7-7 7"
-              />
-            </svg>
-          </button>
+          <div class="flex justify-center gap-4">
+            <button @click="redoCurrentVerse" class="btn btn-outline btn-sm px-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              Redo
+            </button>
+            <button @click="loadNextVerse" class="btn btn-success btn-sm px-4">
+              Next Verse
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 ml-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -163,6 +182,11 @@ function focusCurrentWord() {
   }
 }
 
+const redoCurrentVerse = async () => {
+  btStore.stopTimer();
+  await btStore.init(progressStore.getCurrentVerse);
+};
+
 function loadNextVerse() {
   btStore.uploadStatistics();
   progressStore
@@ -237,5 +261,18 @@ html {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.flex.justify-center.gap-4 {
+  gap: 1rem;
+}
+
+.btn-outline {
+  border-color: hsl(var(--p));
+  color: hsl(var(--p));
+}
+
+.btn-outline:hover {
+  background-color: hsl(var(--p) / 0.1);
 }
 </style>
