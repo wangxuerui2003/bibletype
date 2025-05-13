@@ -21,37 +21,46 @@ export const useAuthStore = defineStore("auth", {
   },
 
   actions: {
-    async init() {
-      try {
-        // Refresh auth state if token exists
-        if (pocketbase.authStore.isValid) {
-          await pocketbase.collection("users").authRefresh();
-          this.user = pocketbase.authStore.record as User;
-        }
-      } catch (err) {
-        this.logout();
-      }
-    },
-
     async loginWithGoogle(redirectUrl?: string) {
       this.isLoading = true;
       this.error = null;
 
       try {
-        await pocketbase.collection("users").authWithOAuth2({
+        const authData = await pocketbase.collection("users").authWithOAuth2({
           provider: "google",
           scopes: ["email", "profile"],
           ...(redirectUrl && { callbackUrl: redirectUrl }),
         });
 
         this.user = pocketbase.authStore.record as User;
-        window.pocketbase = pocketbase;
+
+        // Check if user was just created
+        if (authData.meta?.isNew) {
+          await this.initializeNewUser();
+        }
+
         return true;
       } catch (error) {
         this.error = error instanceof Error ? error.message : "Google login failed";
         return false;
       } finally {
         this.isLoading = false;
+      }
+    },
+
+    async initializeNewUser() {
+      try {
+        console.log("Initialize user progress");
+        // Create initial user progress
+        await pocketbase.collection("user_progress").create({
+          user: this.user?.id,
+          testament: "OT",
+          book: "Genesis",
+          chapter: 1,
+          verse: 1,
+        });
+      } catch (err) {
+        console.error("Failed to initialize new user:", err);
       }
     },
 
