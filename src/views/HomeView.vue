@@ -51,6 +51,11 @@
         <div class="card-body p-4 text-center">
           <h2 class="card-title justify-center text-xl mb-2">Verse Complete! 🎉</h2>
 
+          <div class="text-sm text-gray-500 mb-4">
+            Press <kbd class="kbd kbd-sm">Enter</kbd> for next verse or
+            <kbd class="kbd kbd-sm">Esc</kbd> to redo
+          </div>
+
           <div class="grid grid-cols-3 gap-2 mb-4">
             <div class="bg-base-200 p-2 rounded-lg">
               <div class="text-sm opacity-70">Accuracy</div>
@@ -126,7 +131,17 @@ const btStore = useBTStore();
 const btContainerRef = ref<HTMLElement | null>(null);
 
 function handleKeyDown(e: KeyboardEvent) {
-  if (btStore.isComplete) return;
+  if (btStore.isComplete) {
+    // Let the modal handle these keys
+    if (e.key === "Enter") {
+      e.preventDefault();
+      loadNextVerse();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      redoCurrentVerse();
+    }
+    return;
+  }
 
   const currentWord = btStore.words[btStore.currentIndex];
 
