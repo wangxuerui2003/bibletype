@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-base-200 p-6">
+  <div class="min-h-screen bg-base-200 p-6 disable-scroll">
     <!-- Timer -->
     <div class="stats shadow mb-6 bg-base-100">
       <div class="stat">
@@ -223,7 +223,6 @@ onUnmounted(() => {
 </script>
 
 <style>
-/* Custom transitions */
 #bibletype {
   font-family: "Courier New", monospace;
 }
@@ -289,5 +288,12 @@ html {
 
 .btn-outline:hover {
   background-color: hsl(var(--p) / 0.1);
+}
+
+.disable-scroll {
+  overflow: hidden;
+  height: 100vh;
+  position: fixed;
+  width: 100%;
 }
 </style>
