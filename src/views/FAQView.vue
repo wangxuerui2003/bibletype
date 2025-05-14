@@ -51,7 +51,7 @@ const faqs = ref([
   {
     question: "Can I choose specific Bible books or chapters?",
     answer:
-      "Currently, BibleType progresses sequentially through Hody Bible, but we're working on adding book/chapter selection in a future update.",
+      "Currently, BibleType progresses sequentially through Holy Bible, but we're working on adding book/chapter selection in a future update.",
   },
   {
     question: "Why does it mark words as incorrect when I'm still typing them?",
@@ -61,7 +61,7 @@ const faqs = ref([
   {
     question: "How do I move to the next verse?",
     answer:
-      "After completing a verse, a 'Next Verse' button will appear. Click it to proceed to the next Hody Bible passage.",
+      "After completing a verse, a 'Next Verse' button will appear. Click it to proceed to the next Holy Bible passage.",
   },
   {
     question: "Is my progress saved if I leave the page?",
