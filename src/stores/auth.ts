@@ -48,6 +48,12 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
+    async authRefresh() {
+      if (pocketbase.authStore?.record) {
+        this.user = pocketbase.authStore.record;
+      }
+    },
+
     async initializeNewUser() {
       try {
         // Create initial user progress
