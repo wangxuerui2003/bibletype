@@ -356,11 +356,10 @@ const fetchItems = async (category: number, page: number) => {
     isLoading.value[category] = true;
     const result = await pocketbase.collection("feedback").getList(page, perPage, {
       filter: `category = ${category}`,
-      sort: "-created",
+      sort: "-likes,-created",
       expand: "user,likedBy",
       // fields: "*,likes,likedBy"
     });
-    console.log(result.items);
 
     return {
       items: result.items,
