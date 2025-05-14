@@ -43,6 +43,27 @@
                   <div class="text-xs opacity-50">
                     {{ getUsername(item) }} • {{ formatDate(item.created) }}
                   </div>
+                  <button
+                    @click.stop="toggleLike(item)"
+                    class="btn btn-ghost btn-xs gap-1"
+                    :class="{ 'text-primary': isLiked(item) }"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      />
+                    </svg>
+                    {{ item.likes || 0 }}
+                  </button>
                 </div>
               </div>
 
@@ -112,6 +133,27 @@
                   <div class="text-xs opacity-50">
                     {{ getUsername(item) }} • {{ formatDate(item.created) }}
                   </div>
+                  <button
+                    @click.stop="toggleLike(item)"
+                    class="btn btn-ghost btn-xs gap-1"
+                    :class="{ 'text-primary': isLiked(item) }"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      />
+                    </svg>
+                    {{ item.likes || 0 }}
+                  </button>
                 </div>
               </div>
 
@@ -180,6 +222,27 @@
                   <div class="text-xs opacity-50">
                     {{ getUsername(item) }} • {{ formatDate(item.created) }}
                   </div>
+                  <button
+                    @click.stop="toggleLike(item)"
+                    class="btn btn-ghost btn-xs gap-1"
+                    :class="{ 'text-primary': isLiked(item) }"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      />
+                    </svg>
+                    {{ item.likes || 0 }}
+                  </button>
                 </div>
               </div>
 
@@ -233,7 +296,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import pocketbase from "@/lib/pocketbase";
+import pocketbase, { type User } from "@/lib/pocketbase";
 
 const router = useRouter();
 
@@ -249,8 +312,14 @@ interface FeedbackModel {
   user: string;
   category: number;
   content: string;
+  likes: number;
+  likedBy: string[];
   created: string;
   updated: string;
+  expand?: {
+    likedBy?: User[];
+    user?: User;
+  };
 }
 
 // State for pagination
@@ -288,8 +357,10 @@ const fetchItems = async (category: number, page: number) => {
     const result = await pocketbase.collection("feedback").getList(page, perPage, {
       filter: `category = ${category}`,
       sort: "-created",
-      expand: "user",
+      expand: "user,likedBy",
+      // fields: "*,likes,likedBy"
     });
+    console.log(result.items);
 
     return {
       items: result.items,
@@ -357,7 +428,9 @@ const submitItem = async () => {
     await pocketbase.collection("feedback").create({
       content: newItemContent.value,
       category,
-      user: pocketbase.authStore.model?.id,
+      user: pocketbase.authStore.record?.id,
+      likes: 0,
+      likedBy: [],
     });
 
     // Refresh the current category
@@ -392,6 +465,65 @@ const formatDate = (dateString: string) => {
 // Get username from expanded user relation
 const getUsername = (item: FeedbackModel) => {
   return item.expand?.user?.name || "Anonymous";
+};
+
+// Check if current user has liked the item
+const isLiked = (item: FeedbackModel) => {
+  return item.likedBy?.includes(pocketbase.authStore.record?.id as string) || false;
+};
+
+// Toggle like status
+const toggleLike = async (item: FeedbackModel) => {
+  if (!pocketbase.authStore.isValid) {
+    router.push("/auth");
+    return;
+  }
+
+  const userId = pocketbase.authStore.record?.id;
+  if (!userId) return;
+
+  try {
+    // Get current likedBy array
+    const currentLikedBy = item.likedBy || [];
+    const isCurrentlyLiked = currentLikedBy.includes(userId);
+
+    // Prepare update data
+    const updateData: Partial<FeedbackModel> = {
+      likes: (item.likes || 0) + (isCurrentlyLiked ? -1 : 1),
+    };
+
+    // Update the relation field
+    if (isCurrentlyLiked) {
+      updateData.likedBy = currentLikedBy.filter((id) => id !== userId);
+    } else {
+      updateData.likedBy = [...currentLikedBy, userId];
+    }
+
+    // Update the record
+    const updatedItem = await pocketbase.collection("feedback").update(item.id, updateData);
+
+    // Update local state
+    const updateLocalItem = (items: FeedbackModel[]) => {
+      const index = items.findIndex((i) => i.id === item.id);
+      if (index !== -1) {
+        items[index] = { ...items[index], ...updatedItem };
+      }
+    };
+
+    switch (item.category) {
+      case CATEGORY.FEEDBACK:
+        updateLocalItem(feedbackItems.value);
+        break;
+      case CATEGORY.BUG:
+        updateLocalItem(bugItems.value);
+        break;
+      case CATEGORY.SUGGESTION:
+        updateLocalItem(suggestionItems.value);
+        break;
+    }
+  } catch (error) {
+    console.error("Error toggling like:", error);
+  }
 };
 
 // Check authentication and load data
