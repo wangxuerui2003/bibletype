@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center p-4 bg-base-100">
+  <div class="min-h-screen flex items-center justify-center p-4 bg-base-100 disable-scroll">
     <div class="card w-full max-w-md bg-base-200 shadow-xl">
       <div class="card-body p-8">
         <div class="text-center mb-8">
@@ -61,7 +61,7 @@
           </div>
         </div>
 
-        <div class="divider my-6">or</div>
+        <!-- <div class="divider my-6">or</div> -->
 
         <p class="text-center text-sm text-base-content/70">
           By continuing, you agree to our
@@ -93,5 +93,10 @@ const handleGoogleLogin = async () => {
 </script>
 
 <style scoped>
-/* No custom styles needed - using DaisyUI theme variables */
+.disable-scroll {
+  overflow: hidden;
+  height: 100vh;
+  position: fixed;
+  width: 100%;
+}
 </style>
