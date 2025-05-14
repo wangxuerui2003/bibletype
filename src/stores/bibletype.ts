@@ -1,3 +1,4 @@
+import { normalizeBibleText } from "@/utils/textNormalizer";
 import { defineStore } from "pinia";
 
 export const useBTStore = defineStore("bibletype", {
@@ -45,13 +46,7 @@ export const useBTStore = defineStore("bibletype", {
 
   actions: {
     async init(verseText: string) {
-      const map = {
-        "“": '"',
-        "”": '"',
-        "’": "'",
-        "‘": "'",
-      };
-      this.currentVerse = verseText.trim().replace(/[“”’‘]/gu, (match) => map[match] || match);
+      this.currentVerse = normalizeBibleText(verseText.trim());
       this.words = this.currentVerse.split(/\s+/).map((word) => ({
         text: word,
         completed: false,
