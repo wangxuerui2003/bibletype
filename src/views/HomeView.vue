@@ -135,6 +135,7 @@ function handleKeyDown(e: KeyboardEvent) {
     // Let the modal handle these keys
     if (e.key === "Enter") {
       e.preventDefault();
+      btStore.completeVerse();
       loadNextVerse();
     } else if (e.key === "Escape") {
       e.preventDefault();

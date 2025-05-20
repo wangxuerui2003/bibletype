@@ -59,6 +59,10 @@ export const useBTStore = defineStore("bibletype", {
       this.timerInterval = null;
     },
 
+    completeVerse() {
+      this.isComplete = false;
+    },
+
     updateTypedWord(typed: string) {
       if (!this.startTime) this.startTimer();
 
